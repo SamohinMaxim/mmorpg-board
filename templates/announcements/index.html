@@ -1,0 +1,72 @@
+{% extends 'announcements/base.html' %}
+{% load static %}
+
+{% block title %}Все объявления{% endblock %}
+
+{% block content %}
+<div class="announcements-container">
+  <div class="page-header">
+    <h1 class="page-title">Все объявления</h1>
+    <a href="{% url 'announcements:create_announcement' %}" class="create-btn">Создать объявление</a>
+  </div>
+
+  {% if page_obj %}
+    <div class="announcements-list">
+      {% for announcement in page_obj %}
+        <article class="announcement-card">
+          <div class="announcement-header">
+            <h3 class="announcement-title">
+              <a href="{% url 'announcements:announcement_detail' announcement.pk %}" class="announcement-link">{{ announcement.title }}</a>
+            </h3>
+            <span class="category-badge">{{ announcement.get_category_display }}</span>
+          </div>
+
+          <div class="announcement-content">
+            <p>{{ announcement.content|truncatewords:50 }}</p>
+          </div>
+
+          <div class="announcement-meta">
+            <small>
+              Автор: <span class="author-name">{{ announcement.author.username }}</span> |
+              {{ announcement.created_at|date:"d.m.Y H:i" }}
+            </small>
+          </div>
+
+          {% if announcement.author == user %}
+            <div class="announcement-actions">
+              <a href="{% url 'announcements:edit_announcement' announcement.pk %}"
+                 class="action-btn edit-btn">Редактировать</a>
+              <a href="{% url 'announcements:announcement_responses' announcement.pk %}"
+                 class="action-btn responses-btn">
+                Отклики ({{ announcement.responses.count }})
+              </a>
+            </div>
+          {% endif %}
+        </article>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <p>Пока нет объявлений. Будьте первым!</p>
+      <a href="{% url 'announcements:create_announcement' %}" class="create-btn empty-state-btn">Создать первое объявление</a>
+    </div>
+  {% endif %}
+
+  <!-- Пагинация -->
+  {% if page_obj.has_other_pages %}
+    <div class="pagination-container">
+      <nav class="pagination">
+        {% if page_obj.has_previous %}
+          <a href="?page={{ page_obj.previous_page_number }}" class="pagination-link prev-link">Назад</a>
+        {% endif %}
+
+        <span class="pagination-info">Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>
+
+        {% if page_obj.has_next %}
+          <a href="?page={{ page_obj.next_page_number }}" class="pagination-link next-link">Вперед</a>
+        {% endif %}
+      </nav>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

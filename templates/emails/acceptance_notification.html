@@ -1,0 +1,10 @@
+<h2>Ваш отклик принят!</h2>
+<p>Ваш отклик на объявление "<strong>{{ announcement.title }}</strong>" был принят автором.</p>
+<p><strong>Текст отклика:</strong><br>{{ response.text }}</p>
+
+{% if domain %}
+    <p><a href="https://{{ domain }}{% url 'announcements:index' %}">Вернуться к объявлениям</a></p>
+{% endif %}
+
+<hr>
+<p>С уважением,<br>Команда MMORPG Доска объявлений</p>

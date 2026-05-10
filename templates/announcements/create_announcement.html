@@ -1,0 +1,122 @@
+{% extends 'announcements/base.html' %}
+{% load static %}
+
+{% block title %}Создать объявление{% endblock %}
+
+{% block content %}
+  {% if messages %}
+    <div class="messages">
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <div class="announcement-form-container">
+    <div class="announcement-form-card">
+      <h1 class="form-title">Создать объявление</h1>
+
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="form-fields">
+          <!-- Заголовок -->
+          <div class="form-group">
+            <label for="{{ form.title.id_for_label }}">Заголовок:</label>
+            {{ form.title }}
+            {% if form.title.errors %}
+              <div class="error-message">
+                {% for error in form.title.errors %}{{ error }}{% endfor %}
+              </div>
+            {% endif %}
+          </div>
+
+          <!-- Содержание с CKEditor -->
+          <div class="form-group">
+            <label for="{{ form.content.id_for_label }}">Содержание (можно добавлять фото и видео):</label>
+            {{ form.content }}
+            <small class="form-hint">Используйте инструменты редактора для вставки изображений и видео</small>
+            {% if form.content.errors %}
+              <div class="error-message">
+                {% for error in form.content.errors %}{{ error }}{% endfor %}
+              </div>
+            {% endif %}
+          </div>
+
+          <!-- Категория -->
+          <div class="form-group">
+            <label for="{{ form.category.id_for_label }}">Категория:</label>
+            {{ form.category }}
+            <small class="form-hint">Выберите подходящую категорию для вашего объявления</small>
+            {% if form.category.errors %}
+              <div class="error-message">
+                {% for error in form.category.errors %}{{ error }}{% endfor %}
+              </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Блок для загрузки файлов -->
+        <div class="file-upload-section">
+          <h3>Загрузка медиафайлов</h3>
+          <div class="file-upload-group">
+              <label for="id_media_files">Добавить фото или видео:</label>
+              <input type="file"
+                      id="id_media_files"
+                      name="media_files"
+                      multiple
+                      accept="image/*,video/*"
+                      class="form-control">
+              <small class="form-hint">Вы можете выбрать несколько файлов. Поддерживаются изображения и видео.</small>
+              {% if form.media_files.errors %}
+                <div class="error-message">{{ form.media_files.errors }}</div>
+              {% endif %}
+           </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="submit-button">Создать</button>
+        </div>
+      </form>
+
+      <div class="back-link">
+        <a href="{% url 'announcements:index' %}">Назад к списку</a>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block extra_js %}
+  <!-- Подключаем CKEditor -->
+  <script src="{% static 'ckeditor/ckeditor.js' %}"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const contentField = document.querySelector('#id_content');
+      if (contentField) {
+        ClassicEditor.create(contentField, {
+          toolbar: [
+            'heading', '|', 'bold', 'italic', 'underline', '|',
+            'link', 'imageUpload', 'mediaEmbed', '|',
+            'bulletedList', 'numberedList', '|',
+            'blockQuote', 'insertTable', '|',
+            'undo', 'redo'
+          ],
+          image: {
+            toolbar: ['imageTextAlternative', 'toggleImageCaption', 'imageStyle:full', 'imageStyle:side'],
+            upload: {
+              types: ['jpeg', 'png', 'gif', 'bmp', 'webp']
+            }
+          },
+          mediaEmbed: {
+            previewsInData: true
+          }
+        }).catch(error => {
+          console.error('CKEditor initialization error:', error);
+          contentField.style.display = 'block';
+        });
+      } else {
+        console.warn('Поле #id_content не найдено');
+      }
+    });
+  </script>
+{% endblock %}

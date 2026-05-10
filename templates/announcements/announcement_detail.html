@@ -1,0 +1,84 @@
+{% extends 'announcements/base.html' %}
+{% load static %}
+
+{% block title %}{{ announcement.title }}{% endblock %}
+
+{% block content %}
+<div class="announcement-detail-container">
+  <article class="announcement-card">
+    <div class="announcement-header">
+      <h1 class="announcement-title">{{ announcement.title }}</h1>
+      <span class="category-badge">{{ announcement.get_category_display }}</span>
+    </div>
+
+    <div class="announcement-content">
+      <p>{{ announcement.content }}</p>
+    </div>
+
+    <div class="announcement-meta">
+      <small>
+        Автор: <span class="author-name">{{ announcement.author.username }}</span> |
+        {{ announcement.created_at|date:"d.m.Y H:i" }}
+      </small>
+    </div>
+
+    <!-- Действия для автора -->
+{% if announcement.author == user %}
+  <div class="announcement-actions">
+    <a href="{% url 'announcements:edit_announcement' announcement.pk %}"
+       class="action-btn edit-btn">Редактировать</a>
+    <a href="{% url 'announcements:announcement_responses' announcement.pk %}"
+       class="action-btn responses-btn">
+      Отклики ({{ announcement.responses.count }})
+    </a>
+  </div>
+{% endif %}
+  </article>
+
+  <!-- Форма отклика (только для авторизованных пользователей) -->
+  {% if user.is_authenticated %}
+    <div class="response-form-container">
+      <h3>Оставить отклик</h3>
+      <form method="post" class="response-form">
+        {% csrf_token %}
+        {{ response_form.as_p }}
+        <button type="submit" class="submit-button">Отправить отклик</button>
+      </form>
+    </div>
+  {% else %}
+    <div class="login-prompt">
+      <p>Чтобы оставить отклик, <a href="{% url 'login' %}">войдите</a> в систему.</p>
+    </div>
+  {% endif %}
+
+  <!-- Список откликов -->
+  <div class="responses-list">
+    <h3>Отклики ({{ responses.count }})</h3>
+    {% for response in responses %}
+      <div class="response-item">
+        <p><strong>{{ response.author.username }}:</strong> {{ response.content }}</p>
+        <small>{{ response.created_at|date:"d.m.Y H:i" }}</small>
+      </div>
+    {% empty %}
+      <p>Пока нет откликов.</p>
+    {% endfor %}
+  </div>
+</div>
+{% if announcement.media_files.exists %}
+<div class="media-gallery">
+    <h3>Медиафайлы объявления</h3>
+    <div class="media-container">
+        {% for media in announcement.media_files.all %}
+            {% if media.file_type == 'image' %}
+                <img src="{{ media.file.url }}" alt="Фото объявления" class="gallery-image">
+            {% elif media.file_type == 'video' %}
+                <video controls class="gallery-video">
+                    <source src="{{ media.file.url }}" type="video/mp4">
+                    Ваш браузер не поддерживает видео.
+                </video>
+            {% endif %}
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+{% endblock %}

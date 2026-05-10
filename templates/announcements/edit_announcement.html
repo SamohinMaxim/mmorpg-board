@@ -1,0 +1,29 @@
+{% extends 'announcements/base.html' %}
+{% load static %}
+
+{% block title %}Редактировать объявление: {{ announcement.title }}{% endblock %}
+
+{% block content %}
+<div class="edit-announcement-container">
+  <div class="edit-announcement-card">
+    <h1 class="form-title">Редактировать объявление: <span>{{ announcement.title }}</span></h1>
+
+    <form method="post">
+      {% csrf_token %}
+
+      <div class="form-fields">
+        {{ form.as_p }}
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="save-button">Сохранить</button>
+        <a href="{% url 'announcements:my_announcements' %}" class="cancel-button">Отмена</a>
+      </div>
+    </form>
+
+    <div class="back-link">
+      <a href="{% url 'announcements:my_announcements' %}">Назад к моим объявлениям</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

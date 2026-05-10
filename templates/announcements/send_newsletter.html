@@ -1,0 +1,40 @@
+{% extends 'announcements/base.html' %}
+{% load static %}
+
+{% block title %}Отправить новостную рассылку{% endblock %}
+
+{% block content %}
+<div class="newsletter-container">
+  <div class="newsletter-card">
+    <h1 class="newsletter-title">Отправить новостную рассылку</h1>
+
+    <form method="post" class="newsletter-form">
+      {% csrf_token %}
+
+      <div class="form-group">
+        <label for="id_subject" class="form-label">Тема:</label>
+        {{ form.subject }}
+        {% if form.subject.errors %}
+          <div class="error-message">{{ form.subject.errors }}</div>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="id_content" class="form-label">Содержание:</label>
+        {{ form.content }}
+        {% if form.content.errors %}
+          <div class="error-message">{{ form.content.errors }}</div>
+        {% endif %}
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="submit-btn">Отправить всем пользователям</button>
+      </div>
+    </form>
+
+    <div class="back-link">
+      <a href="{% url 'announcements:index' %}" class="back-btn">Назад на главную</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

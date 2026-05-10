@@ -1,0 +1,69 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}MMORPG Доска объявлений{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="nav-container">
+                <a href="{% url 'announcements:index' %}" class="nav-logo">MMORPG Board</a>
+                <div class="nav-menu">
+                    <a href="{% url 'announcements:index' %}" class="nav-link">Объявления</a>
+
+            {% if user.is_authenticated %}
+                <a href="{% url 'announcements:my_announcements' %}" class="nav-link">Мои объявления</a>
+                <a href="{% url 'announcements:create_announcement' %}" class="nav-btn">Создать</a>
+                <span class="nav-user">Привет, {{ user.username }}!</span>
+                <a href="{% url 'logout' %}" class="nav-btn nav-btn-logout">Выход</a>
+            {% else %}
+                <a href="{% url 'login' %}" class="nav-link">Войти</a>
+                <a href="{% url 'register' %}" class="nav-btn">Зарегистрироваться</a>
+            {% endif %}
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="main-content">
+        {% block content %}
+        <div class="announcements-grid">
+            {% for announcement in announcements %}
+            <article class="announcement-item">
+                <!-- Блок медиаконтента -->
+                <div class="announcement-media">
+                    {% for media in announcement.media_files.all|slice:":2" %}
+                {% if media.is_video %}
+                    <video controls class="media-video">
+                        <source src="{{ media.file.url }}" type="video/mp4">
+                        Ваш браузер не поддерживает видео.
+                    </video>
+                {% else %}
+            <img src="{{ media.file.url }}" alt="{{ announcement.title }}" class="media-image">
+                {% endif %}
+            {% endfor %}
+                </div>
+
+                <!-- Заголовок и информация -->
+                <div class="announcement-info">
+                    <h3 class="announcement-title">
+                <a href="{% url 'announcements:detail' announcement.id %}">
+                    {{ announcement.title }}
+                </a>
+            </h3>
+            <p class="announcement-category">Категория: {{ announcement.get_category_display }}</p>
+            <p class="announcement-date">Создано: {{ announcement.created_at|date:"d.m.Y H:i" }}</p>
+                </div>
+            </article>
+            {% empty %}
+            <p class="no-announcements">Пока нет объявлений. Будьте первым, кто создаст объявление!</p>
+            {% endfor %}
+        </div>
+        {% endblock %}
+    </main>
+</body>
+</html>

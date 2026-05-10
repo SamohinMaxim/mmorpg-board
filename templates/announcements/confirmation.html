@@ -1,0 +1,39 @@
+{% extends 'announcements/base.html' %}
+{% load static %}
+
+{% block title %}Подтверждение кода{% endblock %}
+
+{% block content %}
+<div class="confirmation-container">
+  <div class="confirmation-card">
+    <form method="post">
+      {% csrf_token %}
+
+      <h2 class="confirmation-title">Введите код подтверждения</h2>
+
+      {% if messages %}
+        <div class="messages">
+          {% for message in messages %}
+            <div class="message {% if message.tags == 'error' %}error{% else %}success{% endif %}">
+              {{ message }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <div class="form-group">
+        <label for="id_confirmation_code" class="form-label">Код из письма:</label>
+        <input type="text"
+               name="confirmation_code"
+               id="id_confirmation_code"
+               class="form-input"
+               placeholder="Введите 6‑значный код"
+               maxlength="6"
+               required>
+      </div>
+
+      <button type="submit" class="submit-button">Подтвердить</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

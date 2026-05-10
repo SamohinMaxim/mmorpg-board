@@ -1,0 +1,78 @@
+{% extends 'announcements/base.html' %}
+{% load static %}
+
+{% block title %}Отклики на "{{ announcement.title }}"{% endblock %}
+
+{% block content %}
+<div class="responses-container">
+  <h1>Отклики на объявление "{{ announcement.title }}"</h1>
+
+  <!-- Фильтр статусов -->
+  <div class="filter-controls">
+  <a href="{% url 'announcements:announcement_responses' announcement.pk %}"
+     class="filter-link {% if not status_filter %}active{% endif %}">
+    Все ({{ total_count }})
+  </a>
+  <a href="{% url 'announcements:announcement_responses' announcement.pk %}?status=accepted"
+     class="filter-link {% if status_filter == 'accepted' %}active{% endif %}">
+    Принятые ({{ accepted_count }})
+  </a>
+  <a href="{% url 'announcements:announcement_responses' announcement.pk %}?status=pending"
+     class="filter-link {% if status_filter == 'pending' %}active{% endif %}">
+    Ожидают рассмотрения ({{ pending_count }})
+  </a>
+</div>
+
+  <!-- Список откликов -->
+  <div class="responses-list">
+    {% for response in responses %}
+  <div class="response-item {% if response.is_accepted %}accepted{% endif %}">
+    <div class="response-header">
+      <strong>{{ response.author.username }}</strong>
+      <span class="response-date">{{ response.created_at|date:"d.m.Y H:i" }}</span>
+    </div>
+    <p class="response-text">{{ response.text }}</p>
+
+    <div class="response-actions">
+  <!-- Кнопки для автора объявления (может принимать и удалять любые отклики) -->
+  {% if announcement.author == user %}
+    {% if not response.is_accepted %}
+      <form method="post" action="{% url 'announcements:accept_response' response.pk %}" class="action-form">
+        {% csrf_token %}
+        <button type="submit" class="action-btn accept-btn"
+                onclick="return confirm('Принять этот отклик?')">Принять</button>
+      </form>
+    {% endif %}
+
+    <form method="post" action="{% url 'announcements:delete_response' response.pk %}" class="action-form">
+      {% csrf_token %}
+      <button type="submit" class="action-btn delete-btn"
+              onclick="return confirm('Удалить этот отклик? Это действие нельзя отменить!')">Удалить</button>
+    </form>
+  {% endif %}
+
+  <!-- Кнопка для автора отклика (может удалить только свой отклик, пока он не принят) -->
+  {% if response.author == user and not response.is_accepted %}
+    <form method="post" action="{% url 'announcements:delete_response' response.pk %}" class="action-form">
+      {% csrf_token %}
+      <button type="submit" class="action-btn delete-btn"
+              onclick="return confirm('Удалить свой отклик?')">Удалить свой отклик</button>
+    </form>
+  {% endif %}
+
+  <!-- Статус «Принят» -->
+  {% if response.is_accepted %}
+    <span class="status-badge accepted">Принят</span>
+  {% endif %}
+    </div>
+  </div>
+{% empty %}
+  <p class="no-responses">Пока нет откликов.</p>
+{% endfor %}
+  </div>
+
+  <a href="{% url 'announcements:announcement_detail' announcement.pk %}" class="back-link">
+    ← Вернуться к объявлению
+  </a>
+</div>
+{% endblock %}

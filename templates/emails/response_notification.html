@@ -1,0 +1,11 @@
+<h2>Новый отклик на ваше объявление!</h2>
+<p>На ваше объявление "<strong>{{ announcement.title }}</strong>" поступил новый отклик:</p>
+<blockquote>{{ response.text }}</blockquote>
+<p><em>Автор отклика: {{ response.author.username }}</em></p>
+
+{% if domain %}
+    <p><a href="https://{{ domain }}{% url 'announcements:announcement_responses' announcement.pk %}">Перейти к откликам</a></p>
+{% endif %}
+
+<hr>
+<p>С уважением,<br>Команда MMORPG Доска объявлений</p>

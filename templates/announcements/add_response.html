@@ -1,0 +1,39 @@
+{% extends 'announcements/base.html' %}
+{% load static %}
+
+{% block title %}Отклик на: "{{ announcement.title }}"{% endblock %}
+
+{% block content %}
+<div class="response-container">
+  <div class="announcement-preview">
+    <h1>Отклик на: "{{ announcement.title }}"</h1>
+
+    <div class="announcement-info">
+      <p><strong>Автор:</strong> {{ announcement.author.username }}</p>
+      <p><strong>Категория:</strong> <span class="category-badge">{{ announcement.get_category_display }}</span></p>
+    </div>
+
+    <div class="announcement-content">
+      {{ announcement.content }}
+    </div>
+  </div>
+
+  <div class="response-form">
+    <form method="post">
+      {% csrf_token %}
+
+      <div class="form-fields">
+        {{ form.as_p }}
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="submit-button">Отправить отклик</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="back-link">
+    <a href="{% url 'announcements:index' %}">Назад к списку объявлений</a>
+  </div>
+</div>
+{% endblock %}
